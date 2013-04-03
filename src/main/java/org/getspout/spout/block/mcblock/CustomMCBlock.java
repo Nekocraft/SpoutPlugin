@@ -32,11 +32,12 @@ import net.sf.cglib.proxy.MethodProxy;
 import net.minecraft.server.v1_5_R2.Block;
 import net.minecraft.server.v1_5_R2.BlockButtonAbstract;
 import net.minecraft.server.v1_5_R2.BlockDiodeAbstract;
+import net.minecraft.server.v1_5_R2.BlockFurnace;
 import net.minecraft.server.v1_5_R2.BlockHalfTransparant;
 import net.minecraft.server.v1_5_R2.BlockMinecartTrack;
-import net.minecraft.server.v1_5_R2.BlockPiston;
+import net.minecraft.server.v1_5_R2.BlockPressurePlateAbstract;
+import net.minecraft.server.v1_5_R2.BlockPressurePlateBinary;
 import net.minecraft.server.v1_5_R2.BlockPumpkin;
-import net.minecraft.server.v1_5_R2.BlockRedstoneLamp;
 import net.minecraft.server.v1_5_R2.BlockRedstoneOre;
 import net.minecraft.server.v1_5_R2.BlockRedstoneTorch;
 import net.minecraft.server.v1_5_R2.BlockStem;
@@ -108,100 +109,147 @@ public final class CustomMCBlock implements MethodInterceptor {
 			return null;
 		}
 
-		Block proxy;
-		switch(use) {
-			case None:
-				proxy = (Block) enc.create(); break;
-			case Id:
-				proxy = (Block) enc.create(use.constructor, new Object[] {parent.id}); break;
-			case IdAndStep:
-				{
-					boolean field2;
-					if (parent instanceof BlockStepAbstract) {
-						field2 = ((Boolean)getField(BlockStepAbstract.class, parent, "a")).booleanValue();
-					} else if (parent instanceof BlockRedstoneLamp) {
-						field2 = ((Boolean)getField(parent, "a")).booleanValue();
-					}  else if (parent instanceof BlockDiodeAbstract) {
-						field2 = ((Boolean)getField(parent, "a")).booleanValue();
-					} else {
-						// Furnace
-						field2 = ((Boolean)getField(parent, "b")).booleanValue();
+		try {
+			Block proxy;
+			switch(use) {
+				case None:
+					proxy = (Block) enc.create(); break;
+				case Id:
+					proxy = (Block) enc.create(use.constructor, new Object[] {parent.id}); break;
+				case IdAndStep:
+					{
+						boolean field2;
+						if (parent instanceof BlockStepAbstract) {
+							field2 = ((Boolean)getField(BlockStepAbstract.class, parent, "a")).booleanValue();
+						} else if (parent instanceof BlockFurnace) {
+							field2 = ((Boolean)getField(parent, "b")).booleanValue();
+						} else if (parent instanceof BlockRedstoneTorch) {
+							field2 = ((Boolean)getField(parent, "isOn")).booleanValue();
+						} else if (parent instanceof BlockDiodeAbstract) {
+							field2 = ((Boolean)getField(BlockDiodeAbstract.class, parent, "a")).booleanValue();
+						} else {
+							field2 = ((Boolean)getField(parent, "a")).booleanValue();
+						}
+						proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, field2});
 					}
-					proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, field2});
-				}
-				break;
-			case IdAndMaterial:
-				proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, parent.material}); break;
-			case IdAndTexture:
-				proxy = (Block) enc.create(use.constructor, new Object[] {parent.id}); break;
-			case IdTextureAndMaterial:
-				proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, parent.material}); break;
-			case IdBlockAndOther:
-				{
-					Block field2 = ((Block)getField(parent, "cD"));
-					int field3 = ((Integer)getField(parent, "cE"));
-					proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, field2, field3});
-				}
-				break;
-			case SignBlock:
-				{
-					Class field2 = ((Class)getField(parent, "a"));
-					boolean field3 = ((Boolean)getField(parent, "b"));
-					proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, field2, field3});
-				}
-				break;
-			case IdTextureAndTicks:
-				{
-					boolean field3;
-					if (parent instanceof BlockMinecartTrack || parent instanceof BlockPiston || parent instanceof BlockRedstoneOre || parent instanceof BlockButtonAbstract || parent instanceof BlockPumpkin) {
-						field3 = ((Boolean)getField(parent, "a")).booleanValue();
-					} else if (parent instanceof BlockRedstoneTorch)  {
-						field3 = ((Boolean)getField(parent, "isOn")).booleanValue();
-					} else {
-						field3 = ((Boolean)getField(parent, "isTicking")).booleanValue();
+					break;
+				case IdAndMaterial:
+					proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, parent.material}); break;
+				case IdAndTexture:
+					proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, (Integer)getField(parent, "a")}); break;
+				case IdTextureAndMaterial:
+					proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, parent.material}); break;
+				case IdMaterialAndFlag:
+					proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, parent.material, false}); break;
+				case IdAndName:
+					{
+						String name = (String) getField(parent, "a");
+						proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, name});
 					}
-					proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, field3});
-				}
-				break;
-			case PressurePlate:
-				{
-					EnumMobType field3 = ((EnumMobType)getField(parent, "a"));
-					proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, field3, parent.material});
-				}
-				break;
-			case HugeMushroom:
-				{
-					int field4 = ((Integer)getField(parent, "a"));
-					proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, parent.material, field4});
-				}
-				break;
-			case BlockStem:
-				{
-					Block field2;
-					if (parent instanceof BlockStem) {
-						field2 = ((Block)getField(parent, "blockFruit"));
-					} else {
-						field2 = Block.COBBLESTONE;
+					break;
+				case IdNameAndMaterial:
+					{
+						String name = (String) getField(parent, "a");
+						proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, name, parent.material});
 					}
-					proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, field2});
-				}
-				break;
-			case IdTextureMaterialAndTransparent:
-				{
-					boolean field4 = ((Boolean)getField(BlockHalfTransparant.class, parent, "a")).booleanValue();
-					proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, parent.material, field4});
-				}
-				break;
-			case IdTextureDataMaterialAndDrops:
-				{
-					int field3 = (Integer) getField(parent, "a");
-					boolean field5 = ((Boolean)getField(parent, "b")).booleanValue();
-					proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, field3, parent.material, field5});
-				}
-				break;
-			default: throw new IllegalStateException("Unknown type " +  use);
+					break;
+				case IdNameMaterialAndDrop:
+					{
+						String name = (String) getField(BlockPressurePlateAbstract.class, parent, "a");
+						int field4 = (Integer) getField(parent, "a");
+						proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, name, parent.material, field4});
+					}
+					break;
+				case IdBlockAndOther:
+					{
+						Block field2 = ((Block)getField(parent, "b"));
+						int field3 = ((Integer)getField(parent, "c"));
+						proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, field2, field3});
+					}
+					break;
+				case IdMaterialAndDrop:
+					{
+						int field3 = ((Integer)getField(parent, "b"));
+						proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, parent.material, field3});
+					}
+					break;
+				case SignBlock:
+					{
+						Class field2 = ((Class)getField(parent, "a"));
+						boolean field3 = ((Boolean)getField(parent, "b"));
+						proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, field2, field3});
+					}
+					break;
+				case IdTextureAndTicks:
+					{
+						boolean field3;
+						if (parent instanceof BlockMinecartTrack || parent instanceof BlockRedstoneOre || parent instanceof BlockButtonAbstract || parent instanceof BlockPumpkin) {
+							field3 = ((Boolean)getField(parent, "a")).booleanValue();
+						} else {
+							field3 = ((Boolean)getField(parent, "isTicking")).booleanValue();
+						}
+						proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, field3});
+					}
+					break;
+				case PressurePlate:
+					{
+						EnumMobType field3 = ((EnumMobType)getField(parent, "a"));
+						proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, field3, parent.material});
+					}
+					break;
+				case HugeMushroom:
+					{
+						int field4 = ((Integer)getField(parent, "a"));
+						proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, parent.material, field4});
+					}
+					break;
+				case BlockStem:
+					{
+						Block field2;
+						if (parent instanceof BlockStem) {
+							field2 = ((Block)getField(parent, "blockFruit"));
+						} else {
+							field2 = Block.COBBLESTONE;
+						}
+						proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, field2});
+					}
+					break;
+				case IdTextureMaterialAndTransparent:
+					{
+						boolean field4 = ((Boolean)getField(BlockHalfTransparant.class, parent, "a")).booleanValue();
+						proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, parent.material, field4});
+					}
+					break;
+				case IdTextureDataMaterialAndDrops:
+					{
+						int field3 = (Integer) getField(parent, "a");
+						boolean field5 = ((Boolean)getField(parent, "b")).booleanValue();
+						proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, field3, parent.material, field5});
+					}
+					break;
+				case IdNameMaterialAndMobType:
+					{
+						String name = (String) getField(BlockPressurePlateAbstract.class, parent, "a");
+						EnumMobType mobs = (EnumMobType) getField(BlockPressurePlateBinary.class, parent, "a");
+						proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, name, parent.material, mobs});
+					}
+					break;
+				case IdStringStringMaterialAndFlag:
+					{
+						String field2 = (String) getField(parent, "a");
+						String field3 = (String) getField(parent, "c");
+						boolean field5 = (Boolean) getField(parent, "b");
+						proxy = (Block) enc.create(use.constructor, new Object[] {parent.id, field2, field3, parent.material, field5});
+					}
+					break;
+				default: throw new IllegalStateException("Unknown type " +  use);
+			}
+			return proxy;
+		} catch (RuntimeException e) {
+			System.err.println("Error creating : " + parent.getClass().getName() + " with constructor: " + use.name());
+			e.printStackTrace();
+			return null;
 		}
-		return proxy;
 	}
 
 	public static void replaceBlocks() {
@@ -226,7 +274,12 @@ public final class CustomMCBlock implements MethodInterceptor {
 				Block parent = Block.byId[i];
 				Block.byId[i] = null;
 				try {
-					Block.byId[i] = createProxy(parent);
+					Block fake  = createProxy(parent);;
+					if (fake != null) {
+						Block.byId[i] = fake;
+					} else {
+						Block.byId[i] = parent;
+					}
 				} catch (Throwable t) {
 					System.err.println("Error replacing : " + parent.getClass().getName());
 					t.printStackTrace();
@@ -249,6 +302,11 @@ public final class CustomMCBlock implements MethodInterceptor {
 		IdAndStep(new Class[] {int.class, boolean.class}),
 		IdAndMaterial(new Class[] {int.class, Material.class}),
 		IdAndTexture(new Class[] {int.class, int.class}),
+		IdAndName(new Class[] {int.class, String.class}),
+		IdMaterialAndDrop(new Class[] {int.class, Material.class, int.class}),
+		IdNameAndMaterial(new Class[] {int.class, String.class, Material.class}),
+		IdNameMaterialAndDrop(new Class[] {int.class, String.class, Material.class, int.class}),
+		IdMaterialAndFlag(new Class[] {int.class, Material.class, boolean.class}),
 		IdBlockAndOther(new Class[] {int.class, Block.class, int.class}),
 		SignBlock(new Class[] {int.class, Class.class, boolean.class}),
 		PressurePlate(new Class[] {int.class, int.class, EnumMobType.class, Material.class}),
@@ -257,7 +315,9 @@ public final class CustomMCBlock implements MethodInterceptor {
 		IdTextureAndTicks(new Class[] {int.class, int.class, boolean.class}),
 		IdTextureAndMaterial(new Class[] {int.class, int.class, Material.class}),
 		IdTextureMaterialAndTransparent(new Class[] {int.class, int.class, Material.class, boolean.class}),
-		IdTextureDataMaterialAndDrops(new Class[] {int.class, int.class, int.class, Material.class, boolean.class});
+		IdTextureDataMaterialAndDrops(new Class[] {int.class, int.class, int.class, Material.class, boolean.class}),
+		IdNameMaterialAndMobType(new Class[]{int.class, String.class, Material.class, EnumMobType.class}),
+		IdStringStringMaterialAndFlag(new Class[] {int.class, String.class, String.class, Material.class, boolean.class});
 
 		private final Class[] constructor;
 		BlockConstructor(Class[] constructor) {
@@ -303,9 +363,8 @@ public final class CustomMCBlock implements MethodInterceptor {
 			field.setAccessible(true);
 			return field.get(parent);
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		return null;
 	}
 
 	@SuppressWarnings("rawtypes")

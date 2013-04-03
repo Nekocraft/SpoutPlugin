@@ -38,7 +38,6 @@ import net.minecraft.server.v1_5_R2.IInventory;
 import net.minecraft.server.v1_5_R2.INetworkManager;
 import net.minecraft.server.v1_5_R2.MinecraftServer;
 import net.minecraft.server.v1_5_R2.PlayerConnection;
-import net.minecraft.server.v1_5_R2.NetworkManager;
 import net.minecraft.server.v1_5_R2.ServerConnection;
 import net.minecraft.server.v1_5_R2.TileEntityDispenser;
 import net.minecraft.server.v1_5_R2.TileEntityFurnace;
@@ -1280,7 +1279,7 @@ public class SpoutCraftPlayer extends CraftPlayer implements SpoutPlayer {
 			setPlayerConnection(nm, cp.getHandle().playerConnection);
 			Field handlerList = null;
 			try {
-				handlerList = ServerConnection.class.getDeclaredField("d");
+				handlerList = ServerConnection.class.getDeclaredField("c");
 				handlerList.setAccessible(true);
 				ServerConnection sc = ((DedicatedServer) MinecraftServer.getServer()).ae();
 				List rhandlerList = (List) handlerList.get(sc);
