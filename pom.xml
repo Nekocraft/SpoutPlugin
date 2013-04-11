@@ -121,7 +121,7 @@
 	<!-- Build configuration -->
 	<build>
 		<defaultGoal>clean install</defaultGoal>
-
+		<finalName>${project.name}</finalName>
 		<!-- Resources to include -->
 		<resources>
 			<!-- Static resources -->
