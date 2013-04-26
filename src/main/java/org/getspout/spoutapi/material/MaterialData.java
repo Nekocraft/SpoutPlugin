@@ -32,6 +32,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import org.bukkit.plugin.Plugin;
 
 import org.getspout.spoutapi.SpoutManager;
+import org.getspout.spoutapi.inventory.ItemMap;
 import org.getspout.spoutapi.material.block.Air;
 import org.getspout.spoutapi.material.block.DoubleSlabs;
 import org.getspout.spoutapi.material.block.GenericLiquid;
@@ -839,5 +840,55 @@ public class MaterialData {
 	 */
 	public static Material getMaterial(String notchianName) {
 		return nameLookup.get(notchianName.toLowerCase());
+	}
+
+	/**
+	 * Fetches a {@link CustomBlock} from the map based on plugin and name.
+	 * @param plugin The name of the plugin where the custom block is registered in
+	 * @param name The name of the custom block
+	 * @return The custom block found or null
+	 */
+	public static CustomBlock getCustomBlock(String plugin, String name) {
+		return getCustomBlock(plugin + "." + name);
+	}
+
+	/**
+	 * Fetches a {@link CustomBlock} from the map based on the name provided.
+	 *
+	 * CustomBlocks are keyed to pluginname.name so keep this in mind when passing a full string.
+	 * @param name The name to lookup
+	 * @return The custom block found or null
+	 */
+	public static CustomBlock getCustomBlock(String name) {
+		final Integer id = ItemMap.getRootMap().get(name);
+		if (id == null) {
+			return null;
+		}
+		return customBlockLookup.get(id);
+	}
+
+	/**
+	 * Fetches a {@link CustomItem} from the map based on plugin and name.
+	 * @param plugin The name of the plugin where the custom item is registered in
+	 * @param name The name of the custom item
+	 * @return The custom item found or null
+	 */
+	public static CustomItem getCustomItem(String plugin, String name) {
+		return getCustomItem(plugin + "." + name);
+	}
+
+	/**
+	 * Fetches a {@link CustomItem} from the map based on the name provided.
+	 *
+	 * CustomItems are keyed to pluginname.name so keep this in mind when passing a full string.
+	 * @param name The name to lookup
+	 * @return The custom item found or null
+	 */
+	public static CustomItem getCustomItem(String name) {
+		final Integer id = ItemMap.getRootMap().get(name);
+		if (id == null) {
+			return null;
+		}
+		return customItemLookup.get(id);
 	}
 }

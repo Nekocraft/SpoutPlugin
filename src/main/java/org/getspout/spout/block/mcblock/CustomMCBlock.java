@@ -289,9 +289,9 @@ public final class CustomMCBlock implements MethodInterceptor {
 		}
 		//Fix values
 		System.arraycopy(lightOpacity, 0, Block.lightBlock, 0, lightOpacity.length);
-		System.arraycopy(sArray, 0, Block.s, 0, sArray.length);
-		System.arraycopy(uArray, 0, Block.u, 0, uArray.length);
-		System.arraycopy(wArray, 0, Block.w, 0, wArray.length);
+		//System.arraycopy(sArray, 0, Block.s, 0, sArray.length);
+		//System.arraycopy(uArray, 0, Block.u, 0, uArray.length);
+		//System.arraycopy(wArray, 0, Block.w, 0, wArray.length);
 		System.arraycopy(lightEmission, 0, Block.lightEmission, 0, lightEmission.length);
 	}
 
