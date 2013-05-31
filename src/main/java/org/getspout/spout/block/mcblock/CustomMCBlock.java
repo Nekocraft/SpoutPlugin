@@ -48,6 +48,7 @@ import net.minecraft.server.v1_5_R3.EntityPlayer;
 import net.minecraft.server.v1_5_R3.EnumMobType;
 import net.minecraft.server.v1_5_R3.IBlockAccess;
 import net.minecraft.server.v1_5_R3.Material;
+import net.minecraft.server.v1_5_R3.StepSound;
 import net.minecraft.server.v1_5_R3.World;
 
 import org.getspout.spoutapi.SpoutManager;
@@ -244,6 +245,10 @@ public final class CustomMCBlock implements MethodInterceptor {
 					break;
 				default: throw new IllegalStateException("Unknown type " +  use);
 			}
+			// Restore Parent StepSound
+			if (proxy !=null) {
+				proxy.stepSound = parent.stepSound;
+			}			
 			return proxy;
 		} catch (RuntimeException e) {
 			System.err.println("Error creating : " + parent.getClass().getName() + " with constructor: " + use.name());
@@ -274,12 +279,14 @@ public final class CustomMCBlock implements MethodInterceptor {
 				Block parent = Block.byId[i];
 				Block.byId[i] = null;
 				try {
-					Block fake  = createProxy(parent);;
+					Block fake  = createProxy(parent);
+					
 					if (fake != null) {
 						Block.byId[i] = fake;
 					} else {
 						Block.byId[i] = parent;
 					}
+					
 				} catch (Throwable t) {
 					System.err.println("Error replacing : " + parent.getClass().getName());
 					t.printStackTrace();

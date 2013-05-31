@@ -1,1 +1,4 @@
 language: java
+jdk: oraclejdk7
+
+install: mvn clean package -DbuildNumber=${TRAVIS_BUILD_NUMBER}
